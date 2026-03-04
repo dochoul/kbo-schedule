@@ -28,3 +28,11 @@ export function parseTeams(summary: string): [string, string] | null {
 export function getTeamInfo(name: string): TeamInfo {
   return KBO_TEAMS[name] ?? { color: '#666666', bg: '#f5f5f5' }
 }
+
+// 2026 KBO 시범경기: 3월 12일 ~ 3월 24일 (데이터 기준)
+const PRESEASON_END_KST = '2026-03-24'
+
+export function isPreseason(isoStr: string): boolean {
+  const dateKey = new Date(isoStr).toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' })
+  return dateKey <= PRESEASON_END_KST
+}

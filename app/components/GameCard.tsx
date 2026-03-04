@@ -1,6 +1,6 @@
 'use client'
 
-import { parseTeams, getTeamInfo } from '../lib/kboTeams'
+import { parseTeams, getTeamInfo, isPreseason } from '../lib/kboTeams'
 
 export interface CalendarEvent {
   uid: string
@@ -31,6 +31,7 @@ export default function GameCard({ event }: Props) {
   const homeInfo = getTeamInfo(homeTeam)
   const awayInfo = getTeamInfo(awayTeam)
   const timeStr = event.allDay ? '시간 미정' : toKST(event.start)
+  const preseason = isPreseason(event.start)
 
   return (
     <div
@@ -99,7 +100,7 @@ export default function GameCard({ event }: Props) {
           </>
         )}
 
-        {/* 시간 + 장소 (오른쪽 정렬) */}
+        {/* 시간 + 장소 + 배지 (오른쪽 정렬) */}
         <div
           style={{
             marginLeft: 'auto',
@@ -109,6 +110,25 @@ export default function GameCard({ event }: Props) {
             flexShrink: 0,
           }}
         >
+          {preseason && (
+            <div style={{ marginBottom: 4 }}>
+              <span
+                style={{
+                  display: 'inline-block',
+                  fontSize: 10,
+                  fontWeight: 700,
+                  color: '#7c6a00',
+                  background: '#fff9c2',
+                  border: '1px solid #e8d800',
+                  borderRadius: 4,
+                  padding: '1px 6px',
+                  letterSpacing: '0.03em',
+                }}
+              >
+                시범경기
+              </span>
+            </div>
+          )}
           <div style={{ fontWeight: 600 }}>{timeStr}</div>
           {event.location && (
             <div style={{ fontSize: 12, color: '#888', marginTop: 2 }}>{event.location}</div>
