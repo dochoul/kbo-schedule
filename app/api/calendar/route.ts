@@ -17,7 +17,7 @@ interface CalendarEvent {
 async function fetchAndParseICS(icsUrl: string): Promise<CalendarEvent[]> {
   // next: { revalidate }를 쓰면 Next.js가 응답을 디스크에 캐시합니다.
   // 인메모리 Map과 달리 서버리스 인스턴스가 여러 개여도 같은 캐시를 공유합니다.
-  const response = await fetch(icsUrl, { next: { revalidate: CACHE_TTL_SEC } })
+  const response = await fetch(icsUrl, { cache: 'no-store' })
   if (!response.ok) {
     throw new Error(`ICS fetch 실패: HTTP ${response.status}`)
   }
