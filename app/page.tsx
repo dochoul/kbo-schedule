@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import ICAL from 'ical.js'
 import TeamFilter from './components/TeamFilter'
 import CalendarView from './components/CalendarView'
 import ListView from './components/ListView'
@@ -24,11 +25,30 @@ export default function Home() {
   })
 
   useEffect(() => {
-    fetch(`/api/calendar?url=${encodeURIComponent(KBO_ICS_URL)}`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.error) throw new Error(data.error)
-        setEvents(data.events ?? [])
+    fetch(KBO_ICS_URL)
+      .then((res) => {
+        if (!res.ok) throw new Error(`ICS fetch 실패: HTTP ${res.status}`)
+        return res.text()
+      })
+      .then((text) => {
+        const comp = new ICAL.Component(ICAL.parse(text))
+        const events: CalendarEvent[] = comp
+          .getAllSubcomponents('vevent')
+          .map((vevent: ICAL.Component) => {
+            const ev = new ICAL.Event(vevent)
+            const dtstart = ev.startDate
+            const dtend = ev.endDate
+            return {
+              uid: ev.uid ?? '',
+              summary: ev.summary ?? '',
+              start: dtstart.toJSDate().toISOString(),
+              end: (dtend ?? dtstart).toJSDate().toISOString(),
+              location: ev.location || undefined,
+              description: ev.description || undefined,
+              allDay: dtstart.isDate,
+            }
+          })
+        setEvents(events)
       })
       .catch((e) => setError(e instanceof Error ? e.message : String(e)))
       .finally(() => setLoading(false))
